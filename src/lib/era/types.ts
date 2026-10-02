@@ -9,6 +9,8 @@ export type EraAccount = {
   balance?: { current?: number | null; currency?: string | null } | null;
   /** ISO instant. */
   balance_as_of?: string | null;
+  /** "user_excluded" when the user hid the account in Era; absent when visible. */
+  visibility?: string | null;
 };
 
 export type EraTransaction = {

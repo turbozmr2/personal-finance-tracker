@@ -139,6 +139,9 @@ describe("era map", () => {
     expect(planFor(acct("a", "Mortgage", 1))).toMatchObject({ type: "loan" });
     expect(planFor(acct("a", "Checking", 1, "GBP")).kind).toBe("skip");
     expect(planFor(acct("a", "RealEstate", 1)).kind).toBe("skip");
+    expect(
+      planFor({ ...acct("a", "Savings", 1), visibility: "user_excluded" }),
+    ).toEqual({ kind: "skip", reason: "hidden in Era" });
   });
 
   it("converts amounts to cents and back without float drift", () => {

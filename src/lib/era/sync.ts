@@ -43,6 +43,7 @@ const accountSchema = z.looseObject({
     })
     .nullish(),
   balance_as_of: z.string().nullish(),
+  visibility: z.string().nullish(),
 });
 
 const transactionSchema = z.looseObject({

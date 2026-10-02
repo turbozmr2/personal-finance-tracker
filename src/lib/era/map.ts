@@ -27,6 +27,10 @@ const TYPE_PLANS: Record<string, EraPlan> = {
 };
 
 export function planFor(a: EraAccount): EraPlan {
+  // Era lists hidden accounts anyway, with no balance or transactions; they
+  // are often duplicates, so the user's choice in Era carries over.
+  if (a.visibility === "user_excluded")
+    return { kind: "skip", reason: "hidden in Era" };
   const currency = a.balance?.currency ?? "USD";
   if (currency !== "USD")
     return { kind: "skip", reason: `${currency} — only USD is supported` };
