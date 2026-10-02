@@ -1,9 +1,11 @@
 import { listAccounts } from "@/actions/accounts";
+import { getEraConnectionAction } from "@/actions/era";
 import { getHouseholdAction } from "@/actions/household";
 import { getPaydayAction, getSettingsPage } from "@/actions/settings";
 import { getConnectionAction } from "@/actions/simplefin";
 import { PaydayForm } from "@/components/finance/budget/PaydayForm";
 import { CategoryManager } from "@/components/finance/CategoryManager";
+import { EraCard } from "@/components/finance/era/EraCard";
 import { HouseholdCard } from "@/components/finance/household/HouseholdCard";
 import { RerunButton } from "@/components/finance/RerunButton";
 import { ConnectionsCard } from "@/components/finance/simplefin/ConnectionsCard";
@@ -25,6 +27,7 @@ export default async function SettingsPage() {
   const { stored, resolved } = await getPaydayAction();
   const connection = await getConnectionAction();
   const household = await getHouseholdAction();
+  const era = await getEraConnectionAction();
   const appAccounts = (await listAccounts()).map((a) => ({
     id: a.id,
     name: a.name,
@@ -40,6 +43,12 @@ export default async function SettingsPage() {
             household.createdAt ? stampDate(household.createdAt) : null
           }
           origin={household.origin}
+        />
+        <EraCard
+          connection={era}
+          lastSyncLabel={
+            era.lastSyncAt ? relativeSince(era.lastSyncAt, now) : null
+          }
         />
         <ConnectionsCard
           connection={connection}

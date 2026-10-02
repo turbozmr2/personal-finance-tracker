@@ -1,0 +1,9 @@
+[Unit]
+Description=Snapshot the finance database (and copy it to Cloud Storage when a bucket is set)
+
+[Service]
+Type=oneshot
+User=finance
+WorkingDirectory=/opt/finance/app
+EnvironmentFile=/etc/finance-tracker/env
+ExecStart=/bin/sh -c 'f=$(npm run -s backup) && if [ -n "$BACKUP_BUCKET" ]; then gcloud storage cp "$f" "gs://$BACKUP_BUCKET/"; fi'

@@ -9,7 +9,7 @@ worth, debt payoff, a cash-flow forecast and anomaly alerts.
 
 Everything runs and stays on your computer: there is no account and no cloud
 service — the whole database is one SQLite file you can copy or delete. The
-only network calls are the optional SimpleFIN bank sync described below.
+only network calls are the optional SimpleFIN and Era syncs described below.
 
 ## Requirements
 
@@ -65,6 +65,23 @@ behave the same, and pending rows show a "pending" pill until they post. The
 app never sees your bank passwords; the read-only access URL lives in
 `data/finance.db` and **Disconnect** deletes it, keeping your transactions. CSV
 and OFX import remain available for anything SimpleFIN does not cover.
+
+## Pulling from Era
+
+If your accounts already live in [Era](https://era.app), set `ERA_API_KEY` in
+the server's environment and run `npm run era:sync` (or **Settings → Era →
+Sync now**). It creates an app account for each USD checking, savings and
+credit-card account and brings their transactions through the same pipeline
+as an import; investment, retirement, HSA and loan accounts bring their
+balance only, for net worth. Schedule the command to keep the dashboard live —
+`docs/DEPLOY-GCP.md` does that on a Google Cloud VM.
+
+## Hosting it off your PC
+
+`docs/DEPLOY-GCP.md` runs the app on a small Compute Engine VM (free tier
+eligible) with systemd timers for the Era sync and backups, published through
+the same Cloudflare Tunnel + Access setup as below. Vercel and other
+serverless hosts do not fit: the SQLite file needs a persistent disk.
 
 ## Household access and the wall display
 

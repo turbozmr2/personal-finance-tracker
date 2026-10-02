@@ -72,6 +72,7 @@ doubt, check `node_modules/next/dist/docs/`.
 | `rules/` | `builtin.ts` (`BUILTIN_RULES`, `ensureBuiltinRules`), `engine.ts` (`applyRules`, `pickRule`, `previewRule`, `ensureUserRule`) |
 | `seed/` | `seed(db, { months })`: synthetic demo data for `npm run seed` |
 | `simplefin/` | Bank sync: token decode, HTTP client, payload mapping, request budget, fetch windows, `sync.ts` |
+| `era/` | Era Context sync: a minimal MCP client (`client.ts`), account plans and row mapping (`map.ts`), account links (`store.ts`), `runEraSync` (`sync.ts`), which feeds the SimpleFIN engine's `syncAccount` |
 | `spreading/` | Irregular expenses (annual/quarterly) spread into a monthly set-aside |
 | `transactions/` | List filters and summary, bulk "apply category to merchant", deep links |
 | `transfers/` | `detect.ts` (`pairTransfers`, own-transfer patterns), `apply.ts` (`applyTransfers`) |
@@ -123,6 +124,14 @@ each mapped account, `syncAccount`:
 3. inserts the new rows under a synthetic `imports` row named `simplefin:<id>:<tag>`;
 4. records the balance snapshot and drops pending rows that have vanished;
 5. calls the same **`postProcessImport`**.
+
+**Era reuses that engine.** `runEraSync` (`src/lib/era/sync.ts`) calls Era's
+`accounts__list_financial_accounts` and pages through
+`transactions__list_transactions` over MCP, links each Era account to an app
+account (`ensureLinks`, creating it on first sight), reshapes the account into a
+`SfinAccount` and its rows into `MappedRow`s, and hands each account to the
+exported `syncAccount` with `source: "era"`. Only cash and card accounts send
+rows; investment and loan accounts send their balance alone.
 
 ## Data model
 
@@ -251,6 +260,8 @@ export async function renameThingAction(input: unknown): Promise<{ ok: true } | 
 |---|---|---|
 | `FINANCE_DB` | `src/lib/db/client.ts` (`dbPath`) | Path of the SQLite file. Default `data/finance.db` under the working directory. `npm run seed` and `npm run backup` respect it |
 | `LOCALAPPDATA` | `scripts/app.mjs` | Windows only: used to locate Chrome for the app window |
+| `ERA_API_KEY` | `src/lib/era/client.ts` (`eraConfigFromEnv`) | Era Context API key; enables `npm run era:sync` and Settings → Era. A server secret, never stored in the database |
+| `ERA_MCP_URL` | `src/lib/era/client.ts` | Era's MCP endpoint. Default `https://context.era.app/mcp` |
 
 Nothing else reads `process.env`. SimpleFIN credentials and the wall token hash
 are stored in the `settings` table, not the environment.

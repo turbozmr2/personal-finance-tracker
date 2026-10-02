@@ -1,0 +1,15 @@
+[Unit]
+Description=Personal Finance Tracker (Next.js on port 3000)
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+User=finance
+WorkingDirectory=/opt/finance/app
+EnvironmentFile=/etc/finance-tracker/env
+ExecStart=/usr/bin/npm run start -- --hostname 127.0.0.1 --port 3000
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

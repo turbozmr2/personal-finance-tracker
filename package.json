@@ -14,6 +14,7 @@
     "db:generate": "drizzle-kit generate",
     "seed": "tsx scripts/seed.ts",
     "backup": "tsx scripts/backup.ts",
+    "era:sync": "tsx scripts/era-sync.ts",
     "app": "node scripts/app.mjs"
   },
   "dependencies": {

@@ -89,8 +89,8 @@ export function dedupeById(list: SfinTransaction[]): {
   return { txns: [...byId.values()], dropped: list.length - byId.size };
 }
 
-function importFilename(sfinId: string, tag: string): string {
-  return `simplefin:${sfinId}:${tag}`;
+function importFilename(source: string, sfinId: string, tag: string): string {
+  return `${source}:${sfinId}:${tag}`;
 }
 
 /** An `imports` row for this account and sync; the filename is bumped on the rare collision. */
@@ -101,9 +101,14 @@ function createImportRow(
   tag: string,
   rowCount: number,
   newCount: number,
+  source: string,
 ): number {
   for (let n = 1; n <= 50; n++) {
-    const filename = importFilename(sfinId, n === 1 ? tag : `${tag}#${n}`);
+    const filename = importFilename(
+      source,
+      sfinId,
+      n === 1 ? tag : `${tag}#${n}`,
+    );
     const fileHash = createHash("sha256").update(filename).digest("hex");
     const clash = tx
       .select({ id: imports.id })
@@ -141,7 +146,11 @@ type ExistingRow = {
   dedupeHash: string;
 };
 
-function syncAccount(
+/**
+ * Upsert one account's feed rows and balance. Exported for other feeds (Era)
+ * that reshape their data into a `SfinAccount` and its mapped rows.
+ */
+export function syncAccount(
   tx: Db,
   args: {
     accountId: number;
@@ -152,6 +161,8 @@ function syncAccount(
     window?: Window;
     /** False when the payload is too thin to prove a pending row is gone. */
     cleanup: boolean;
+    /** Prefix of the synthetic `imports` filename; defaults to "simplefin". */
+    source?: string;
   },
 ): SyncResult {
   const { accountId, account, now } = args;
@@ -359,6 +370,7 @@ function syncAccount(
       args.importTag,
       rows.length,
       toInsert.length,
+      args.source ?? "simplefin",
     );
     freshIds = tx
       .insert(transactions)
