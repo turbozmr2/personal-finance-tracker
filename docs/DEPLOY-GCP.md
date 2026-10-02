@@ -31,8 +31,24 @@ gcloud compute instances create finance \
 Leave the default firewall alone: the app listens on `127.0.0.1` only and
 the tunnel (step 5) is outbound, so **no inbound port is opened**.
 
-`e2-small` (2 GB RAM, about $13/month) builds faster and needs no swap; the
-script adds 2 GB of swap so `e2-micro` can build too.
+**Building on `e2-micro` crawls or stalls.** Its 1 GB of RAM and shared CPU
+are enough to *run* the app but not to build it: `next build` pages to swap
+and can sit at "Creating an optimized production build" indefinitely. Build
+on a bigger machine type for a few minutes, then switch back:
+
+```
+gcloud compute instances stop finance --zone=us-central1-a
+gcloud compute instances set-machine-type finance --zone=us-central1-a --machine-type=e2-medium
+gcloud compute instances start finance --zone=us-central1-a
+# … ssh in and run setup.sh (step 2), then:
+gcloud compute instances stop finance --zone=us-central1-a
+gcloud compute instances set-machine-type finance --zone=us-central1-a --machine-type=e2-micro
+gcloud compute instances start finance --zone=us-central1-a
+```
+
+The services are enabled at boot, so the app and timers come back on their
+own. Every redeploy needs the same detour; to skip it, keep the VM on
+`e2-small` (2 GB RAM, about $13/month), which builds without help.
 
 ## 2. Install the app
 
