@@ -9,11 +9,23 @@ BRANCH="${2:-main}"
 APP=/opt/finance/app
 ENV_FILE=/etc/finance-tracker/env
 
+# Cloud Shell is a throwaway container, not the server; the VM is reached with
+# `gcloud compute ssh`. (`sudo` drops CLOUD_SHELL, so look for its files too.)
+if [ "${CLOUD_SHELL:-}" = "true" ] || [ -d /google/devshell ]; then
+  echo "This is Cloud Shell, not the VM. Connect first:" >&2
+  echo "  gcloud compute ssh finance --zone=us-central1-a" >&2
+  exit 1
+fi
+
 # e2-micro has 1 GB of RAM; `next build` needs more, so add swap once.
 if ! swapon --show | grep -q /swapfile; then
-  fallocate -l 2G /swapfile && chmod 600 /swapfile
-  mkswap /swapfile && swapon /swapfile
-  echo '/swapfile none swap sw 0 0' >> /etc/fstab
+  fallocate -l 2G /swapfile && chmod 600 /swapfile && mkswap /swapfile >/dev/null
+  if swapon /swapfile; then
+    grep -q '^/swapfile ' /etc/fstab || echo '/swapfile none swap sw 0 0' >> /etc/fstab
+  else
+    echo "Warning: could not enable swap; the build may run out of memory." >&2
+    rm -f /swapfile
+  fi
 fi
 
 # Node 24, git, and a compiler in case better-sqlite3 has no prebuilt binary.
