@@ -1,0 +1,10 @@
+[Unit]
+Description=Era sync twice a day (Era refreshes banks every 24h on the Organize plan)
+
+[Timer]
+OnCalendar=*-*-* 06:20,18:20
+RandomizedDelaySec=10m
+Persistent=true
+
+[Install]
+WantedBy=timers.target

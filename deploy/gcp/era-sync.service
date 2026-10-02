@@ -1,0 +1,10 @@
+[Unit]
+Description=Pull accounts, balances and transactions from Era Context
+After=network-online.target
+
+[Service]
+Type=oneshot
+User=finance
+WorkingDirectory=/opt/finance/app
+EnvironmentFile=/etc/finance-tracker/env
+ExecStart=/usr/bin/npm run -s era:sync
