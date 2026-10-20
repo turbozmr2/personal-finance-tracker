@@ -158,7 +158,7 @@ export function ensurePhase9(db: Db): number | null {
 
 /**
  * One-time re-resolve after the ACH label strip (2026-10-20): rows like
- * "ACH Transaction - FID BKG SVC LLC MONEYLINE" all cleaned to "Ach", so one
+ * "ACH Transaction - ACME BKG SVC LLC MONEYLINE" all cleaned to "Ach", so one
  * merchant stood for every ACH originator and couldn't be categorized as a
  * whole. Re-resolve every merchant, give uncategorized rows the rules they now
  * match, and refresh bills. Returns the number of merchants changed.

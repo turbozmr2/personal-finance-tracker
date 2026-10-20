@@ -78,7 +78,7 @@ const P2P =
   /^(?:zelle|venmo|paypal)\s+(?:payment|transfer)?\s*(?:to|from)\s+(.+)$/i;
 
 /**
- * "ACH Transaction - FID BKG SVC LLC MONEYLINE": the bank's generic ACH label
+ * "ACH Transaction - ACME BKG SVC LLC MONEYLINE": the bank's generic ACH label
  * in front of the company actually paid or paying. Without this the
  * "transaction" tail takes everything after the label and every ACH row
  * cleans to "Ach", one merchant for dozens of unrelated companies.
